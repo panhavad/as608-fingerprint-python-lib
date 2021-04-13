@@ -1,12 +1,12 @@
 import time
 import as608_lib
 
-# If using with a computer such as Linux/RaspberryPi, Mac, Windows with USB/serial converter:
 import serial
-# uart = serial.Serial("COM8", baudrate=57600, timeout=3)
+
+#this is important to set baudrate of 115200 so there are no data lost
 uart = serial.Serial("COM8", baudrate=115200, timeout=3)
 
-finger = as608_lib.Adafruit_Fingerprint(uart)
+finger = as608_lib.Operation(uart)
 
 ##################################################
 
@@ -19,7 +19,6 @@ def sensor_reset():
     print("Sensor is reset.")
 
 
-# pylint: disable=too-many-branches
 def fingerprint_check_file():
     """Compares a new fingerprint template to an existing template stored in a file
     This is useful when templates are stored centrally (i.e. in a database)"""
@@ -33,7 +32,6 @@ def fingerprint_check_file():
 
     print("Loading file template...", end="", flush=True)
     with open("template0.dat", "rb") as file:
-        print('+++++++++++++++++++', type(file))
         data = file.read()
     finger.send_fpdata(list(data), "char", 2)
 

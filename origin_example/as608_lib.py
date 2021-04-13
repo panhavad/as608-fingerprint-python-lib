@@ -64,12 +64,10 @@ ADDRCODE = 0x20
 PASSVERIFY = 0x21
 MODULEOK = 0x55
 
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-public-methods
-class Adafruit_Fingerprint:
+class Operation:
 	"""UART based fingerprint sensor."""
 
-	_debug = True
+	_debug = False
 	_uart = None
 
 	password = None
@@ -312,7 +310,6 @@ class Adafruit_Fingerprint:
 	def _get_packet(self, expected):
 		"""Helper to parse out a packet from the UART and check structure.
 		Returns just the data payload from the packet"""
-		# time.sleep(1)
 		res = self._uart.read(expected)
 		if res[0:4] == _DEFADDRESS:
 			res = b'\xef\x01' + res
@@ -350,7 +347,6 @@ class Adafruit_Fingerprint:
 		"""Gets packet from serial and checks structure for _DATAPACKET
 		and _ENDDATAPACKET.  Alternate method for getting data such
 		as fingerprint image, etc.  Returns the data payload."""
-		# time.sleep(0.5)
 		res = self._uart.read(expected)
 		self._print_debug("_get_data received data:", res, data_type="hex")
 		if (not res) or (len(res) != expected):
@@ -480,31 +476,3 @@ class Adafruit_Fingerprint:
 			print("*** DEBUG ==>", info, ["{:02x}".format(i) for i in data])
 		elif data_type == "str":
 			print("*** DEBUG ==>", info, data)
-	
-# if __name__ == "__main__":
-	# ser = None
-	# fgp = None
-
-	# def connect_device():
-	# 	global fgp
-
-	# 	try:
-	# 		ser = serial.Serial('COM8', 9600, timeout=0)
-	# 	except Exception:
-	# 		print("Fail to connect COM port, please check COM port")
-	# 		return False
-	# 	if (ser):
-	# 		fgp = Adafruit_Fingerprint(ser)
-	# 		if (fgp):
-	# 			print("Finger Print connected!")
-	# 			return True
-	# 		else:
-	# 			return False
-	# 	else:
-	# 		return False
-
-	# if connect_device():
-	
-	# ser = serial.Serial('COM8', 9600, timeout=0)
-	# fgp = Adafruit_Fingerprint(ser)
-	# fgp.set_led()

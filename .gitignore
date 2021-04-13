@@ -5,6 +5,7 @@ _build
 *.pyc
 .env
 env/*
+database/*
 bundles
 *.DS_Store
 .eggs

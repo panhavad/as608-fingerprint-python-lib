@@ -1,25 +1,12 @@
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-
 import time
 import serial
 
 import as608_lib
 
+#this is important to set baudrate of 115200 so there are no data lost
+ser = serial.Serial("COM8", baudrate=115200, timeout=3)
 
-# import board
-# uart = busio.UART(board.TX, board.RX, baudrate=57600)
-
-# If using with a computer such as Linux/RaspberryPi, Mac, Windows with USB/serial converter:
-uart = serial.Serial("COM8", baudrate=57600, timeout=3)
-
-# If using with Linux/Raspberry Pi and hardware UART:
-# uart = serial.Serial("/dev/ttyS0", baudrate=57600, timeout=1)
-
-# If using with Linux/Raspberry Pi 3 with pi3-disable-bt
-# uart = serial.Serial("/dev/ttyAMA0", baudrate=57600, timeout=1)
-
-finger = as608_lib.Adafruit_Fingerprint(uart)
+finger = as608_lib.Operation(ser)
 
 ##################################################
 
@@ -83,77 +70,6 @@ def get_fingerprint_detail():
         else:
             print("Other error")
         return False
-
-
-# pylint: disable=too-many-statements
-def enroll_finger(location):
-    """Take a 2 finger images and template it, then store in 'location'"""
-    for fingerimg in range(1, 3):
-        if fingerimg == 1:
-            print("Place finger on sensor...", end="", flush=True)
-        else:
-            print("Place same finger again...", end="", flush=True)
-
-        while True:
-            i = finger.get_image()
-            if i == as608_lib.OK:
-                print("Image taken")
-                break
-            if i == as608_lib.NOFINGER:
-                print(".", end="", flush=True)
-            elif i == as608_lib.IMAGEFAIL:
-                print("Imaging error")
-                return False
-            else:
-                print("Other error")
-                return False
-
-        print("Templating...", end="", flush=True)
-        i = finger.image_2_tz(fingerimg)
-        if i == as608_lib.OK:
-            print("Templated")
-        else:
-            if i == as608_lib.IMAGEMESS:
-                print("Image too messy")
-            elif i == as608_lib.FEATUREFAIL:
-                print("Could not identify features")
-            elif i == as608_lib.INVALIDIMAGE:
-                print("Image invalid")
-            else:
-                print("Other error")
-            return False
-
-        if fingerimg == 1:
-            print("Remove finger")
-            time.sleep(1)
-            while i != as608_lib.NOFINGER:
-                i = finger.get_image()
-
-    print("Creating model...", end="", flush=True)
-    i = finger.create_model()
-    if i == as608_lib.OK:
-        print("Created")
-    else:
-        if i == as608_lib.ENROLLMISMATCH:
-            print("Prints did not match")
-        else:
-            print("Other error")
-        return False
-
-    print("Storing model #%d..." % location, end="", flush=True)
-    i = finger.store_model(location)
-    if i == as608_lib.OK:
-        print("Stored")
-    else:
-        if i == as608_lib.BADLOCATION:
-            print("Bad storage location")
-        elif i == as608_lib.FLASHERR:
-            print("Flash storage error")
-        else:
-            print("Other error")
-        return False
-
-    return True
 
 
 def save_fingerprint_image(filename):
